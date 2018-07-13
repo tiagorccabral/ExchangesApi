@@ -1,1 +1,13 @@
+venv/
+.vscode
+**.pyc
+*.pyc
+*.cpython-34.pyc
+**.cpython-34.pyc
+*.cpython-35.pyc
+**.cpython-35.pyc
+**__pycache__
+*__pycache__
+sqlite3.db
+db.sqlite3
 .idea
