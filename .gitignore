@@ -11,3 +11,4 @@ venv/
 sqlite3.db
 db.sqlite3
 .idea
+my_secrets/secrets.py
