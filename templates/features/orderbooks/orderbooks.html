@@ -1,2 +1,48 @@
-{{ bitstampResponse.bids }}
-{{ bitcointradeResponse.bids }}
+{% extends "base.html" %}
+
+{% block body_block %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Bitstamp</h2>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">Preço (USD)</th>
+                        <th scope="col">Quantidade (BTC)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for bid in bitstampResponse.bids  %}
+                        <tr>
+                            {% for item in bid %}
+                                <td>{{ item }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h3>Bitcointrade</h3>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">Preço</th>
+                        <th scope="col">Quantidade</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for bid in bitcointradeResponse.data.bids  %}
+                        <tr>
+                            <td>{{ bid.unit_price }}</td>
+                            <td>{{ bid.amount }} (BTC)</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
