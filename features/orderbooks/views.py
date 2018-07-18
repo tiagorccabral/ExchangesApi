@@ -6,8 +6,8 @@ from my_secrets import secrets
 from orderbooks.models import (
     BitcointradeBitcoinBid, BitcointradeBitcoinAsk,
     BitstampBitcoinBid, BitstampBitcoinAsk,
-    BitcointradeEthereumsBid, BitcointradeEthereumsAsk
-)
+    BitcointradeEthereumsBid, BitcointradeEthereumsAsk,
+    BitstampEthereumsBid, BitstampEthereumsAsk)
 
 
 class RequestOrderBookView(View):
@@ -76,10 +76,26 @@ class RequestOrderBookView(View):
         )
 
         BitcointradeEthereumsAsk.objects.create(
-            first_coin_value=bitcointradeResponse['data']['asks'][0]['unit_price'],
-            second_coin_value=bitcointradeResponse['data']['asks'][1]['unit_price'],
-            first_amount=bitcointradeResponse['data']['asks'][0]['amount'],
-            second_amount=bitcointradeResponse['data']['asks'][1]['amount'],
+            first_coin_value=bitcointradeETHResponse['data']['asks'][0]['unit_price'],
+            second_coin_value=bitcointradeETHResponse['data']['asks'][1]['unit_price'],
+            first_amount=bitcointradeETHResponse['data']['asks'][0]['amount'],
+            second_amount=bitcointradeETHResponse['data']['asks'][1]['amount'],
+            saved_at=current_date,
+        )
+
+        BitstampEthereumsBid.objects.create(
+            first_coin_value=bitstampurlETHResponse['bids'][0][0],
+            second_coin_value=bitstampurlETHResponse['bids'][1][0],
+            first_amount=bitstampurlETHResponse['bids'][0][1],
+            second_amount=bitstampurlETHResponse['bids'][1][1],
+            saved_at=current_date,
+        )
+
+        BitstampEthereumsAsk.objects.create(
+            first_coin_value=bitstampurlETHResponse['asks'][0][0],
+            second_coin_value=bitstampurlETHResponse['asks'][1][0],
+            first_amount=bitstampurlETHResponse['asks'][0][1],
+            second_amount=bitstampurlETHResponse['asks'][1][1],
             saved_at=current_date,
         )
 
@@ -91,18 +107,30 @@ class RequestOrderBookGraphView(View):
 
     def get(self, request):
 
-        # Set headers and urls
-        # headers = {'Authorization': "ApiToken {}".format(secrets.BIT_COIN_TRADE_TOKEN)}
-        bitcointradeurl = "https://api.bitcointrade.com.br/v1/public/BTC/orders"
-        bitstrampurl = "https://www.bitstamp.net/api/v2/order_book/btcusd/"
+        # BitcoinTrade bid e asks de Bitcoin
+        bitcointradeBid = BitcointradeBitcoinBid.objects.all().values()
+        bitcointradeAsk = BitcointradeBitcoinAsk.objects.all().values()
 
-        # Makes requisitions
-        bitcointradeResponse = requests.get(bitcointradeurl).json()
-        bitstampResponse = requests.get(bitstrampurl).json()
+        # BitcoinTrade bid e asks de Ethereum
+        bitcointradeBidEth = BitcointradeEthereumsBid.objects.all().values()
+        bitcointradeAskEth = BitcointradeEthereumsAsk.objects.all().values()
 
+        # Bitstamp bid e asks de Bitcoin
+        bitstampBid = BitstampBitcoinBid.objects.all().values()
+        bitstampAsk = BitstampBitcoinAsk.objects.all().values()
+
+        # Bitstamp bid e asks de Ethereums
+        bitstampBidEth = BitstampEthereumsBid.objects.all().values()
+        bitstampAskEth = BitstampEthereumsAsk.objects.all().values()
 
         # Return data to template
         return render(request, "features/orderbooks/orderbooks.html", {
-            'bitstampResponse': bitstampResponse,
-            'bitcointradeResponse': bitcointradeResponse
+            'bitcointradeBidBitcoin': bitcointradeBid,
+            'bitcointradeAskBitcoin': bitcointradeAsk,
+            'bitcointradeBidEthereum': bitcointradeBidEth,
+            'bitcointradeAskEthereum': bitcointradeAskEth,
+            'bitstampBidBitcoin': bitstampBid,
+            'bitstampAskBitcoin': bitstampAsk,
+            'bistampBidEthereum': bitstampBidEth,
+            'bitstampAskEthereum': bitstampAskEth,
         })
