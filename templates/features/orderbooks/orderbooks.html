@@ -111,7 +111,7 @@
         {% for item in bitcointradeBidEthereum %}
             first_bid_values_eth.push({{ item.first_coin_value }});
             second_bid_values_eth.push({{ item.second_coin_value }});
-            first_bid_time_eth.push("{{ item.saved_at.time|localtime|date:"G:i:s" }}");
+            first_bid_time_eth.push("{{ item.saved_at.time|date:"G:i:s" }}");
         {% endfor %}
 
         {% for item in bitcointradeAskEthereum %}

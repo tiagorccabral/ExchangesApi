@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     'orderbooks',
     
     # Third-party libraries
-    'django_secrets'
+    'django_secrets',
+    'django_cron',
+    'django_crontab'
 ]
 
 MIDDLEWARE = [
@@ -130,4 +132,13 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     STATIC_DIR,
+]
+
+# Django cron tasks
+CRON_CLASSES = [
+    "orderbooks.schedules.RequestExchangesDataJob",
+]
+
+CRONJOBS = [
+    ('* * * * *', 'orderbooks.schedules.SaveExchangeDataJob', '>> /home/tiagorc-cabral/Documentos/estagio/cronjob.log')
 ]
