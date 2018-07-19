@@ -1,0 +1,452 @@
+{% extends "base.html" %}
+
+{% block body_block %}
+    {% load static %}
+    {% load tz %}
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <hr>
+                <h1 class="text-center">BitcoinTrade - Bitcoin</h1>
+            </div>
+            <div class="col-md-6">
+                <canvas id="BitcoinTrade-First-BidAsk-Bitcoin"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="BitcoinTrade-Second-BidAsk-Bitcoin"></canvas>
+            </div>
+            <div class="col-md-12">
+                <hr>
+                <h1 class="text-center">BitcoinTrade - Ethereum</h1>
+            </div>
+            <div class="col-md-6">
+                <canvas id="BitcoinTrade-First-BidAsk-Ethereum"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="BitcoinTrade-Second-BidAsk-Ethereum"></canvas>
+            </div>
+            <div class="col-md-12">
+                <hr>
+                <h1 class="text-center">Bitstamp - Bitcoin</h1>
+            </div>
+            <div class="col-md-6">
+                <canvas id="Bitstamp-First-BidAsk-Bitcoin"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="Bitstamp-Second-BidAsk-Bitcoin"></canvas>
+            </div>
+            <div class="col-md-12">
+                <hr>
+                <h1 class="text-center">Bitstamp - Ethereum</h1>
+            </div>
+            <div class="col-md-6">
+                <canvas id="Bitstamp-First-BidAsk-Ethereum"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="Bitstamp-Second-BidAsk-Ethereum"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script type="text/javascript" src="{% static "chartsjs/Chart.bundle.min.js" %}"></script>
+    <script>
+
+        {# Valores do Bitcointrade para primeiros bids e asks de bitcoins #}
+        let first_bid_values = [];
+        let first_bid_time = [];
+        let first_ask_values = [];
+
+        {# Valores do Bitcointrade para segundos bids e asks de bitcoins #}
+        let second_bid_values = [];
+        let second_ask_values = [];
+
+        {# Valores do Bitcointrade para os primeiros bids e asks de ethereums #}
+        let first_bid_values_eth = [];
+        let first_bid_time_eth = [];
+        let first_ask_values_eth = [];
+
+        {# Valores do Bitcointrade para segundos bids e asks de ethereums #}
+        let second_bid_values_eth = [];
+        let second_ask_values_eth = [];
+
+        {# Valores do Bitstamp para primeiros bids e asks de bitcoins #}
+        let bitstamp_first_bid_values = [];
+        let bitstamp_first_bid_time = [];
+        let bitstamp_first_ask_values = [];
+
+        {# Valores do Bitstamp para segundos bids e asks de bitcoins #}
+        let bitstamp_second_bid_values = [];
+        let bitstamp_second_ask_values = [];
+
+        {# Valores do Bitstamp para os primeiros bids e asks de ethereums #}
+        let bitstamp_first_bid_values_eth = [];
+        let bitstamp_first_bid_time_eth = [];
+        let bitstamp_first_ask_values_eth = [];
+
+        {# Valores do Bitstamp para segundos bids e asks de ethereums #}
+        let bitstamp_second_bid_values_eth = [];
+        let bitstamp_second_ask_values_eth = [];
+
+
+
+        {# BitcoinTrade setando bid e asks de Bitcoins #}
+
+        {% for item in bitcointradeBidBitcoin %}
+            first_bid_values.push({{ item.first_coin_value }});
+            second_bid_values.push({{ item.second_coin_value }});
+            first_bid_time.push("{{ item.saved_at.time|date:"G:i:s" }}");
+        {% endfor %}
+
+
+        {% for item in bitcointradeAskBitcoin %}
+            first_ask_values.push({{ item.first_coin_value }});
+            second_ask_values.push({{ item.second_coin_value }});
+        {% endfor %}
+
+        {# BitcoinTrade setando bid e asks de Ethereums #}
+
+        {% for item in bitcointradeBidEthereum %}
+            first_bid_values_eth.push({{ item.first_coin_value }});
+            second_bid_values_eth.push({{ item.second_coin_value }});
+            first_bid_time_eth.push("{{ item.saved_at.time|date:"G:i:s" }}");
+        {% endfor %}
+
+        {% for item in bitcointradeAskEthereum %}
+            first_ask_values_eth.push({{ item.first_coin_value }});
+            second_ask_values_eth.push({{ item.second_coin_value }});
+        {% endfor %}
+
+        {# Bitstamp setando bid e asks de Bitcoins #}
+
+        {% for item in bitstampBidBitcoin %}
+            bitstamp_first_bid_values.push({{ item.first_coin_value }});
+            bitstamp_second_bid_values.push({{ item.second_coin_value }});
+            bitstamp_first_bid_time.push("{{ item.saved_at.time|date:"G:i:s" }}");
+        {% endfor %}
+
+
+        {% for item in bitstampAskBitcoin %}
+            bitstamp_first_ask_values.push({{ item.first_coin_value }});
+            bitstamp_second_ask_values.push({{ item.second_coin_value }});
+        {% endfor %}
+
+        {# Bitstamp setando bid e asks de Ethereums #}
+
+        {% for item in bistampBidEthereum %}
+            bitstamp_first_bid_values_eth.push({{ item.first_coin_value }});
+            bitstamp_second_bid_values_eth.push({{ item.second_coin_value }});
+            bitstamp_first_bid_time_eth.push("{{ item.saved_at.time|date:"G:i:s" }}");
+        {% endfor %}
+
+
+        {% for item in bitstampAskEthereum %}
+            bitstamp_first_ask_values_eth.push({{ item.first_coin_value }});
+            bitstamp_second_ask_values_eth.push({{ item.second_coin_value }});
+        {% endfor %}
+
+        const BitcoinTradeFirstBidAskBitcoin = document.getElementById('BitcoinTrade-First-BidAsk-Bitcoin');
+        new Chart(BitcoinTradeFirstBidAskBitcoin, {
+            type: 'line',
+            data: {
+                labels:first_bid_time,
+                datasets: [
+                    {
+                        label: 'Valor do primeiro bid',
+                        borderColor: "blue",
+                        data: first_bid_values,
+                    },
+                    {
+                        label: 'Valor do primeiro ask',
+                        borderColor: "red",
+                        data: first_ask_values
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Data (hora:minutos:segundo)'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Valor em Reais (Bitcoin)'
+                        }
+                    }]
+                }
+            }
+
+        });
+
+        const BitcoinTradeSecondBidAskBitcoin = document.getElementById('BitcoinTrade-Second-BidAsk-Bitcoin');
+        new Chart(BitcoinTradeSecondBidAskBitcoin, {
+            type: 'line',
+            data: {
+                labels:first_bid_time,
+                datasets: [
+                    {
+                        label: 'Valor do segundo bid',
+                        borderColor: "blue",
+                        data: second_bid_values,
+                    },
+                    {
+                        label: 'Valor do segundo ask',
+                        borderColor: "red",
+                        data: second_ask_values
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Data (hora:minutos:segundo)'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Valor em Reais (Bitcoin)'
+                        }
+                    }]
+                }
+            }
+
+        });
+
+        const BitcoinTradeFirstBidAskEthereum = document.getElementById('BitcoinTrade-First-BidAsk-Ethereum');
+        new Chart(BitcoinTradeFirstBidAskEthereum, {
+            type: 'line',
+            data: {
+                labels:first_bid_time,
+                datasets: [
+                    {
+                        label: 'Valor do primeiro bid',
+                        borderColor: "blue",
+                        data: first_bid_values_eth,
+                    },
+                    {
+                        label: 'Valor do primeiro ask',
+                        borderColor: "red",
+                        data: first_ask_values_eth
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Data (hora:minutos:segundo)'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Valor em Reais (Ethereum)'
+                        }
+                    }]
+                }
+            }
+
+        });
+
+        const BitcoinTradeSecondBidAskEthereum = document.getElementById('BitcoinTrade-Second-BidAsk-Ethereum');
+        new Chart(BitcoinTradeSecondBidAskEthereum, {
+            type: 'line',
+            data: {
+                labels:first_bid_time,
+                datasets: [
+                    {
+                        label: 'Valor do segundo bid',
+                        borderColor: "blue",
+                        data: second_bid_values_eth,
+                    },
+                    {
+                        label: 'Valor do segundo ask',
+                        borderColor: "red",
+                        data: second_ask_values_eth
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Data (hora:minutos:segundo)'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Valor em Reais (Ethereum)'
+                        }
+                    }]
+                }
+            }
+
+        });
+
+        {% comment %}
+            *****************
+                Bitstamp
+            *****************
+        {% endcomment %}
+
+        const BitstampFirstBidAskBitcoin = document.getElementById('Bitstamp-First-BidAsk-Bitcoin');
+        new Chart(BitstampFirstBidAskBitcoin, {
+            type: 'line',
+            data: {
+                labels:bitstamp_first_bid_time,
+                datasets: [
+                    {
+                        label: 'Valor do primeiro bid',
+                        borderColor: "blue",
+                        data: bitstamp_first_bid_values,
+                    },
+                    {
+                        label: 'Valor do primeiro ask',
+                        borderColor: "red",
+                        data: bitstamp_first_ask_values
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Data (hora:minutos:segundo)'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Valor em USD (Bitcoin)'
+                        }
+                    }]
+                }
+            }
+
+        });
+
+        const BitstampSecondBidAskBitcoin = document.getElementById('Bitstamp-Second-BidAsk-Bitcoin');
+        new Chart(BitstampSecondBidAskBitcoin, {
+            type: 'line',
+            data: {
+                labels:first_bid_time,
+                datasets: [
+                    {
+                        label: 'Valor do segundo bid',
+                        borderColor: "blue",
+                        data: bitstamp_second_bid_values,
+                    },
+                    {
+                        label: 'Valor do segundo ask',
+                        borderColor: "red",
+                        data: bitstamp_second_ask_values
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Data (hora:minutos:segundo)'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Valor em USD (Bitcoin)'
+                        }
+                    }]
+                }
+            }
+
+        });
+
+        const BitstampFirstBidAskEthereum = document.getElementById('Bitstamp-First-BidAsk-Ethereum');
+        new Chart(BitstampFirstBidAskEthereum, {
+            type: 'line',
+            data: {
+                labels:bitstamp_first_bid_time_eth,
+                datasets: [
+                    {
+                        label: 'Valor do primeiro bid',
+                        borderColor: "blue",
+                        data: bitstamp_first_bid_values_eth,
+                    },
+                    {
+                        label: 'Valor do primeiro ask',
+                        borderColor: "red",
+                        data: bitstamp_first_ask_values_eth
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Data (hora:minutos:segundo)'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Valor em USD (Ethereum)'
+                        }
+                    }]
+                }
+            }
+
+        });
+
+        const BitstampSecondBidAskEthereum = document.getElementById('Bitstamp-Second-BidAsk-Ethereum');
+        new Chart(BitstampSecondBidAskEthereum, {
+            type: 'line',
+            data: {
+                labels:first_bid_time,
+                datasets: [
+                    {
+                        label: 'Valor do segundo bid',
+                        borderColor: "blue",
+                        data: bitstamp_second_bid_values_eth,
+                    },
+                    {
+                        label: 'Valor do segundo ask',
+                        borderColor: "red",
+                        data: bitstamp_second_ask_values_eth
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Data (hora:minutos:segundo)'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Valor em USD (Ethereum)'
+                        }
+                    }]
+                }
+            }
+
+        });
+    </script>
+{% endblock %}

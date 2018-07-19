@@ -11,16 +11,18 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from my_secrets import secrets
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '_o+oz_ksx8!55v&m=p8-jp6bx#ac*41v2zjdv$272m^u!2(nbp'
+SECRET_KEY = secrets.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,6 +39,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Created apps
+    'api',
+    'features',
+    'orderbooks',
+    
+    # Third-party libraries
+    'django_secrets',
+    'django_cron',
+    'django_crontab'
 ]
 
 MIDDLEWARE = [
@@ -54,7 +66,7 @@ ROOT_URLCONF = 'ExchangeApi.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATE_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -75,9 +87,17 @@ WSGI_APPLICATION = 'ExchangeApi.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': secrets.POSTGRES_DB_NAME,
+        'USER': secrets.POSTGRES_USERNAME,
+        'PASSWORD': secrets.POSTGRES_PASSWORD,
+        'HOST': 'localhost',
+        'PORT': '',
+    },
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    # }
 }
 
 
@@ -105,7 +125,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
@@ -118,3 +138,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+# Django cron tasks
+CRON_CLASSES = [
+    "orderbooks.schedules.RequestExchangesDataJob",
+]
+
+CRONJOBS = [
+    ('* * * * *', 'orderbooks.schedules.SaveExchangeDataJob', '>> /home/tiagorc-cabral/Documentos/estagio/cronjob.log')
+]
+
+# Configure Django App for Heroku.
+import django_heroku
+django_heroku.settings(locals())
