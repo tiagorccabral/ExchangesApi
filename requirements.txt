@@ -6,3 +6,4 @@ django-crontab===0.7.1
 psycopg2===2.7.5
 django-heroku===0.3.1
 dj-database-url===0.5.0
+pyopenssl===18.0.0
