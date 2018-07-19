@@ -22,7 +22,7 @@ STATIC_DIR = os.path.join(BASE_DIR, 'static')
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '_o+oz_ksx8!55v&m=p8-jp6bx#ac*41v2zjdv$272m^u!2(nbp'
+SECRET_KEY = secrets.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -86,18 +86,18 @@ WSGI_APPLICATION = 'ExchangeApi.wsgi.application'
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': secrets.POSTGRES_DB_NAME,
-        'USER': secrets.POSTGRES_USERNAME,
-        'PASSWORD': secrets.POSTGRES_PASSWORD,
-        'HOST': 'localhost',
-        'PORT': '',
-    },
     # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    # }
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': secrets.POSTGRES_DB_NAME,
+    #     'USER': secrets.POSTGRES_USERNAME,
+    #     'PASSWORD': secrets.POSTGRES_PASSWORD,
+    #     'HOST': 'localhost',
+    #     'PORT': '',
+    # },
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
 }
 
 
