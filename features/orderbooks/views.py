@@ -1,6 +1,7 @@
 import datetime
 import requests
 from django.shortcuts import render, redirect
+from django.utils import timezone
 from django.views import View
 from my_secrets import secrets
 from orderbooks.models import (
@@ -33,7 +34,7 @@ class RequestOrderBookView(View):
         bitstampurlETHResponse = requests.get(bitstampurlETH).json()
 
         # Sets a current time for all the information collected by the responses
-        current_date = datetime.datetime.now()
+        current_date = timezone.localtime()
 
         BitcointradeBitcoinBid.objects.create(
             first_coin_value=bitcointradeResponse['data']['bids'][0]['unit_price'],
@@ -107,21 +108,24 @@ class RequestOrderBookGraphView(View):
 
     def get(self, request):
 
+        # Sets interval to be greater or equal to the last 24 hours
+        date_interval = datetime.datetime.now() - datetime.timedelta(days=1)
+
         # BitcoinTrade bid e asks de Bitcoin
-        bitcointradeBid = BitcointradeBitcoinBid.objects.all().values()
-        bitcointradeAsk = BitcointradeBitcoinAsk.objects.all().values()
+        bitcointradeBid = BitcointradeBitcoinBid.objects.filter(saved_at__gte=date_interval).values()
+        bitcointradeAsk = BitcointradeBitcoinAsk.objects.filter(saved_at__gte=date_interval).values()
 
         # BitcoinTrade bid e asks de Ethereum
-        bitcointradeBidEth = BitcointradeEthereumsBid.objects.all().values()
-        bitcointradeAskEth = BitcointradeEthereumsAsk.objects.all().values()
+        bitcointradeBidEth = BitcointradeEthereumsBid.objects.filter(saved_at__gte=date_interval).values()
+        bitcointradeAskEth = BitcointradeEthereumsAsk.objects.filter(saved_at__gte=date_interval).values()
 
         # Bitstamp bid e asks de Bitcoin
-        bitstampBid = BitstampBitcoinBid.objects.all().values()
-        bitstampAsk = BitstampBitcoinAsk.objects.all().values()
+        bitstampBid = BitstampBitcoinBid.objects.filter(saved_at__gte=date_interval).values()
+        bitstampAsk = BitstampBitcoinAsk.objects.filter(saved_at__gte=date_interval).values()
 
         # Bitstamp bid e asks de Ethereums
-        bitstampBidEth = BitstampEthereumsBid.objects.all().values()
-        bitstampAskEth = BitstampEthereumsAsk.objects.all().values()
+        bitstampBidEth = BitstampEthereumsBid.objects.filter(saved_at__gte=date_interval).values()
+        bitstampAskEth = BitstampEthereumsAsk.objects.filter(saved_at__gte=date_interval).values()
 
         # Return data to template
         return render(request, "features/orderbooks/orderbooks.html", {

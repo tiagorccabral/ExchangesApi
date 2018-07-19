@@ -1,0 +1,5 @@
+django===2.0.7
+django-secrets===1.0.2
+requests===2.19.1
+django_cron===0.5.1
+django-crontab===0.7.1
