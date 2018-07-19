@@ -9,4 +9,7 @@ SECRET_KEYS = [
     # start with your Django secret key like this:
     "SECRET_KEY",
     "BIT_COIN_TRADE_TOKEN",
+    "POSTGRES_USERNAME",
+    "POSTGRES_PASSWORD",
+    "POSTGRES_DB_NAME"
 ]

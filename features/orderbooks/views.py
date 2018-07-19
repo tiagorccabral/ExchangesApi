@@ -109,7 +109,7 @@ class RequestOrderBookGraphView(View):
     def get(self, request):
 
         # Sets interval to be greater or equal to the last 24 hours
-        date_interval = datetime.datetime.now() - datetime.timedelta(days=1)
+        date_interval = timezone.now() - datetime.timedelta(days=1)
 
         # BitcoinTrade bid e asks de Bitcoin
         bitcointradeBid = BitcointradeBitcoinBid.objects.filter(saved_at__gte=date_interval).values()

@@ -87,9 +87,17 @@ WSGI_APPLICATION = 'ExchangeApi.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': secrets.POSTGRES_DB_NAME,
+        'USER': secrets.POSTGRES_USERNAME,
+        'PASSWORD': secrets.POSTGRES_PASSWORD,
+        'HOST': 'localhost',
+        'PORT': '',
+    },
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    # }
 }
 
 
@@ -142,3 +150,7 @@ CRON_CLASSES = [
 CRONJOBS = [
     ('* * * * *', 'orderbooks.schedules.SaveExchangeDataJob', '>> /home/tiagorc-cabral/Documentos/estagio/cronjob.log')
 ]
+
+# Configure Django App for Heroku.
+import django_heroku
+django_heroku.settings(locals())
