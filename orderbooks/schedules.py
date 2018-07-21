@@ -1,9 +1,10 @@
 import requests
-import datetime
+from django.utils import timezone
 from django_cron import CronJobBase, Schedule
 
 from orderbooks.models import BitcointradeBitcoinBid, BitcointradeBitcoinAsk, BitstampBitcoinBid, BitstampBitcoinAsk, \
-    BitcointradeEthereumsBid, BitcointradeEthereumsAsk, BitstampEthereumsBid, BitstampEthereumsAsk
+    BitcointradeEthereumsBid, BitcointradeEthereumsAsk, BitstampEthereumsBid, BitstampEthereumsAsk, SpreadMaxBid, \
+    BitstampEthBtcBid, BitstampEthBtcAsk, SpreadMaxAsk
 
 
 def SaveExchangeDataJob():
@@ -11,6 +12,7 @@ def SaveExchangeDataJob():
     # headers = {'Authorization': "ApiToken {}".format(secrets.BIT_COIN_TRADE_TOKEN)}
     bitcointradeurl = "https://api.bitcointrade.com.br/v1/public/BTC/orders"
     bitstrampurl = "https://www.bitstamp.net/api/v2/order_book/btcusd/"
+    bitstampethbtcurl = "https://www.bitstamp.net/api/v2/order_book/ethbtc/"
 
     bitcointradeurlETH = "https://api.bitcointrade.com.br/v1/public/ETH/orders"
     bitstampurlETH = "https://www.bitstamp.net/api/v2/order_book/ethusd/"
@@ -20,13 +22,17 @@ def SaveExchangeDataJob():
     bitcointradeResponse = requests.get(bitcointradeurl).json()
     bitstampResponse = requests.get(bitstrampurl).json()
 
+    # Makes requisitions for eth/btc
+
+    bitstampEthBtcResponse = requests.get(bitstampethbtcurl).json()
+
     # Makes requisitions for ethereums
 
     bitcointradeETHResponse = requests.get(bitcointradeurlETH).json()
     bitstampurlETHResponse = requests.get(bitstampurlETH).json()
 
     # Sets a current time for all the information collected by the responses
-    current_date = datetime.datetime.now()
+    current_date = timezone.localtime()
 
     BitcointradeBitcoinBid.objects.create(
         first_coin_value=bitcointradeResponse['data']['bids'][0]['unit_price'],
@@ -92,6 +98,40 @@ def SaveExchangeDataJob():
         saved_at=current_date,
     )
 
+    BitstampEthBtcBid.objects.create(
+        first_coin_value=bitstampEthBtcResponse['bids'][0][0],
+        first_amount=bitstampEthBtcResponse['bids'][0][1],
+        saved_at=current_date,
+    )
+
+    BitstampEthBtcAsk.objects.create(
+        first_coin_value=bitstampEthBtcResponse['asks'][0][0],
+        first_amount=bitstampEthBtcResponse['asks'][0][1],
+        saved_at=current_date,
+    )
+
+    # Calculates the Max Spread for asks and saves it
+
+    spread_result_ask = ((bitcointradeETHResponse['data']['asks'][0]['unit_price'] /
+                          bitcointradeResponse['data']['asks'][0]['unit_price']) /
+                         float(bitstampEthBtcResponse['asks'][0][0])) - 1.00
+
+    SpreadMaxAsk.objects.create(
+        spread=spread_result_ask,
+        saved_at=current_date
+    )
+
+    # Calculates the Max Spread for bids and saves it
+
+    spread_result_bid = ((bitcointradeETHResponse['data']['bids'][0]['unit_price'] /
+                          bitcointradeResponse['data']['bids'][0]['unit_price']) /
+                         float(bitstampEthBtcResponse['bids'][0][0])) - 1.00
+
+    SpreadMaxBid.objects.create(
+        spread=spread_result_bid,
+        saved_at=current_date
+    )
+
 class RequestExchangesDataJob(CronJobBase):
     RUN_EVERY_MINS = 1  # every 1 minute
 
@@ -103,6 +143,7 @@ class RequestExchangesDataJob(CronJobBase):
         # headers = {'Authorization': "ApiToken {}".format(secrets.BIT_COIN_TRADE_TOKEN)}
         bitcointradeurl = "https://api.bitcointrade.com.br/v1/public/BTC/orders"
         bitstrampurl = "https://www.bitstamp.net/api/v2/order_book/btcusd/"
+        bitstampethbtcurl = "https://www.bitstamp.net/api/v2/order_book/ethbtc/"
 
         bitcointradeurlETH = "https://api.bitcointrade.com.br/v1/public/ETH/orders"
         bitstampurlETH = "https://www.bitstamp.net/api/v2/order_book/ethusd/"
@@ -112,13 +153,17 @@ class RequestExchangesDataJob(CronJobBase):
         bitcointradeResponse = requests.get(bitcointradeurl).json()
         bitstampResponse = requests.get(bitstrampurl).json()
 
+        # Makes requisitions for eth/btc
+
+        bitstampEthBtcResponse = requests.get(bitstampethbtcurl).json()
+
         # Makes requisitions for ethereums
 
         bitcointradeETHResponse = requests.get(bitcointradeurlETH).json()
         bitstampurlETHResponse = requests.get(bitstampurlETH).json()
 
         # Sets a current time for all the information collected by the responses
-        current_date = datetime.datetime.now()
+        current_date = timezone.localtime()
 
         BitcointradeBitcoinBid.objects.create(
             first_coin_value=bitcointradeResponse['data']['bids'][0]['unit_price'],
@@ -182,4 +227,38 @@ class RequestExchangesDataJob(CronJobBase):
             first_amount=bitstampurlETHResponse['asks'][0][1],
             second_amount=bitstampurlETHResponse['asks'][1][1],
             saved_at=current_date,
+        )
+
+        BitstampEthBtcBid.objects.create(
+            first_coin_value=bitstampEthBtcResponse['bids'][0][0],
+            first_amount=bitstampEthBtcResponse['bids'][0][1],
+            saved_at=current_date,
+        )
+
+        BitstampEthBtcAsk.objects.create(
+            first_coin_value=bitstampEthBtcResponse['asks'][0][0],
+            first_amount=bitstampEthBtcResponse['asks'][0][1],
+            saved_at=current_date,
+        )
+
+        # Calculates the Max Spread for asks and saves it
+
+        spread_result_ask = ((bitcointradeETHResponse['data']['asks'][0]['unit_price'] /
+                              bitcointradeResponse['data']['asks'][0]['unit_price']) /
+                             float(bitstampEthBtcResponse['asks'][0][0])) - 1.00
+
+        SpreadMaxAsk.objects.create(
+            spread=spread_result_ask,
+            saved_at=current_date
+        )
+
+        # Calculates the Max Spread for bids and saves it
+
+        spread_result_bid = ((bitcointradeETHResponse['data']['bids'][0]['unit_price'] /
+                              bitcointradeResponse['data']['bids'][0]['unit_price']) /
+                             float(bitstampEthBtcResponse['bids'][0][0])) - 1.00
+
+        SpreadMaxBid.objects.create(
+            spread=spread_result_bid,
+            saved_at=current_date
         )
