@@ -8,3 +8,5 @@ django-heroku===0.3.1
 dj-database-url===0.5.0
 pyopenssl===18.0.0
 celery===4.2.0
+djangorestframework===3.8.2
+django-cors-headers===2.4.0

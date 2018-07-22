@@ -8,6 +8,17 @@
         <div class="row">
             <div class="col-md-12">
                 <hr>
+            </div>
+            <div class="col-md-6">
+                <h2 class="text-center">Spread Máximo - Ask </h2>
+                <canvas id="Spread-Max-Ask"></canvas>
+            </div>
+            <div class="col-md-6">
+                <h2 class="text-center">Spread Máximo - Bid </h2>
+                <canvas id="Spread-Max-Bid"></canvas>
+            </div>
+            <div class="col-md-12">
+                <hr>
                 <h1 class="text-center">BitcoinTrade - Bitcoin</h1>
             </div>
             <div class="col-md-6">
@@ -90,6 +101,17 @@
         let bitstamp_second_bid_values_eth = [];
         let bitstamp_second_ask_values_eth = [];
 
+        {# Valores do Bitstamp para primeiro bid e ask de ETH/BTC #}
+
+        let bitstamp_first_ask_eth_btc_values = [];
+        let bitstamp_first_bid_eth_btc_values = [];
+        let bitstamp_eth_btc_times = [];
+
+        {# Valores de maximo bid e ask #}
+
+        let spread_max_ask_values = [];
+        let spread_max_bid_values = [];
+        let spread_max_times = [];
 
 
         {# BitcoinTrade setando bid e asks de Bitcoins #}
@@ -145,6 +167,30 @@
         {% for item in bitstampAskEthereum %}
             bitstamp_first_ask_values_eth.push({{ item.first_coin_value }});
             bitstamp_second_ask_values_eth.push({{ item.second_coin_value }});
+        {% endfor %}
+
+        {# Bitstamp setando ask de ETH/BTC  #}
+
+        {% for item in bitstampEthBtcAsk %}
+            bitstamp_first_ask_eth_btc_values.push({{ item.first_coin_value }});
+        {% endfor %}
+
+        {# Bitstamp setando bid de ETH/BTC  #}
+
+        {% for item in bitstampEthBtcBid %}
+            bitstamp_first_bid_eth_btc_values.push({{ item.first_coin_value }});
+            bitstamp_eth_btc_times.push("{{ item.saved_at.time|date:"G:i:s" }}");
+        {% endfor %}
+
+        {# Setando valores de spread maximo para Ask e Bid #}
+
+        {% for item in spreadMaxAsk %}
+            spread_max_ask_values.push({{ item.spread }});
+            spread_max_times.push("{{ item.saved_at.time|date:"G:i:s" }}");
+        {% endfor %}
+
+        {% for item in spreadMaxBid %}
+            spread_max_bid_values.push({{ item.spread }});
         {% endfor %}
 
         const BitcoinTradeFirstBidAskBitcoin = document.getElementById('BitcoinTrade-First-BidAsk-Bitcoin');
@@ -450,6 +496,9 @@
                 ]
             },
             options: {
+                animation: {
+                    duration: 0
+                },
                 responsive: true,
                 tooltips: {
                     mode: 'index',
@@ -496,6 +545,9 @@
                 ]
             },
             options: {
+                animation: {
+                    duration: 0
+                },
                 responsive: true,
                 tooltips: {
                     mode: 'index',
@@ -516,6 +568,120 @@
                         scaleLabel: {
                             display: true,
                             labelString: 'Valor em USD (Ethereum)'
+                        }
+                    }]
+                }
+            }
+
+        });
+
+        const SpreadMaxAsk = document.getElementById('Spread-Max-Ask');
+        new Chart(SpreadMaxAsk, {
+            type: 'line',
+            data: {
+                labels:bitstamp_eth_btc_times,
+                datasets: [
+                    {
+                        label: 'Primeiro ask Bitcointrade (BTC)',
+                        borderColor: "red",
+                        data: first_ask_values,
+                    },
+                    {
+                        label: 'Primeiro ask Bitcointrade (ETH)',
+                        borderColor: "blue",
+                        data: first_ask_values_eth,
+                    },
+                    {
+                        label: 'Primeiro ask Bitstamp (ETH/BTC)',
+                        borderColor: "green",
+                        data: bitstamp_first_ask_eth_btc_values
+                    },
+                    {
+                        label: 'Spread Maximo Ask',
+                        borderColor: "black",
+                        data: spread_max_ask_values
+                    }
+                ]
+            },
+            options: {
+                suggestedMin: -50,
+                responsive: true,
+                tooltips: {
+                    mode: 'index',
+                    intersect: false
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                scales: {
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Data (hora:minutos:segundo)'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Valores'
+                        }
+                    }]
+                }
+            }
+
+        });
+
+        const SpreadMaxBid = document.getElementById('Spread-Max-Bid');
+        new Chart(SpreadMaxBid, {
+            type: 'line',
+            data: {
+                labels:bitstamp_eth_btc_times,
+                datasets: [
+                    {
+                        label: 'Primeiro bid Bitcointrade (BTC)',
+                        borderColor: "red",
+                        data: first_bid_values,
+                    },
+                    {
+                        label: 'Primeiro bid Bitcointrade (ETH)',
+                        borderColor: "blue",
+                        data: first_bid_values_eth,
+                    },
+                    {
+                        label: 'Primeiro bid Bitstamp (ETH/BTC)',
+                        borderColor: "green",
+                        data: bitstamp_first_bid_eth_btc_values
+                    },
+                    {
+                        label: 'Spread Maximo Bid',
+                        borderColor: "black",
+                        data: spread_max_bid_values
+                    }
+                ]
+            },
+            options: {
+                suggestedMin: -50,
+                responsive: true,
+                tooltips: {
+                    mode: 'index',
+                    intersect: false
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                scales: {
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Data (hora:minutos:segundo)'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Valores'
                         }
                     }]
                 }
