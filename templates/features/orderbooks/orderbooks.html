@@ -105,6 +105,7 @@
 
         let bitstamp_first_ask_eth_btc_values = [];
         let bitstamp_first_bid_eth_btc_values = [];
+        let bitstamp_eth_btc_times = [];
 
         {# Valores de maximo bid e ask #}
 
@@ -178,6 +179,7 @@
 
         {% for item in bitstampEthBtcBid %}
             bitstamp_first_bid_eth_btc_values.push({{ item.first_coin_value }});
+            bitstamp_eth_btc_times.push("{{ item.saved_at.time|date:"G:i:s" }}");
         {% endfor %}
 
         {# Setando valores de spread maximo para Ask e Bid #}
@@ -494,6 +496,9 @@
                 ]
             },
             options: {
+                animation: {
+                    duration: 0
+                },
                 responsive: true,
                 tooltips: {
                     mode: 'index',
@@ -540,6 +545,9 @@
                 ]
             },
             options: {
+                animation: {
+                    duration: 0
+                },
                 responsive: true,
                 tooltips: {
                     mode: 'index',
@@ -571,7 +579,7 @@
         new Chart(SpreadMaxAsk, {
             type: 'line',
             data: {
-                labels:spread_max_times,
+                labels:bitstamp_eth_btc_times,
                 datasets: [
                     {
                         label: 'Primeiro ask Bitcointrade (BTC)',
@@ -628,7 +636,7 @@
         new Chart(SpreadMaxBid, {
             type: 'line',
             data: {
-                labels:spread_max_times,
+                labels:bitstamp_eth_btc_times,
                 datasets: [
                     {
                         label: 'Primeiro bid Bitcointrade (BTC)',

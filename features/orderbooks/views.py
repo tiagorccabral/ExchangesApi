@@ -3,6 +3,11 @@ import requests
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.views import View
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from features.orderbooks.tasks import save_order_books
 from my_secrets import secrets
 from orderbooks.models import (
     BitcointradeBitcoinBid, BitcointradeBitcoinAsk,
@@ -189,3 +194,11 @@ class RequestOrderBookGraphView(View):
             'spreadMaxAsk': spread_max_ask,
             'spreadMaxBid': spread_max_bid,
         })
+
+
+@api_view()
+def SaveDataView(request):
+
+    save_order_books()
+
+    return Response({"message": "Dados salvos!"})
