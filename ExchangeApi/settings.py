@@ -48,12 +48,14 @@ INSTALLED_APPS = [
     # Third-party libraries
     'django_secrets',
     'django_cron',
-    'django_crontab'
+    'django_crontab',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -132,6 +134,19 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+
+# List of domains allowed to make requests
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_PREFLIGHT_MAX_AGE = 86400
+CORS_ALLOW_METHODS = (
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+)
 
 
 # Static files (CSS, JavaScript, Images)
