@@ -1,9 +1,12 @@
 import requests
 from django.utils import timezone
+from requests import RequestException
+
 from orderbooks.models import BitcointradeBitcoinBid, BitcointradeBitcoinAsk, BitstampBitcoinBid, BitstampBitcoinAsk, \
     BitcointradeEthereumsBid, BitcointradeEthereumsAsk, BitstampEthereumsBid, BitstampEthereumsAsk, SpreadMaxBid, \
     BitstampEthBtcBid, BitstampEthBtcAsk, SpreadMaxAsk
 
+MAX_WAIT_TIME = 5
 
 def save_order_books():
 
@@ -22,13 +25,24 @@ def save_order_books():
     bitstampResponse = requests.get(bitstrampurl).json()
 
     # Makes requisitions for eth/btc
-
-    bitstampEthBtcResponse = requests.get(bitstampethbtcurl).json()
+    try:
+        bitstampEthBtcResponse = requests.get(bitstampethbtcurl, timeout=MAX_WAIT_TIME).json()
+    except ConnectionError as e:
+        print("A resposta de Bitstamp Eth/Btc não funcionou. " + str(e) + "\n")
+        save_order_books()
 
     # Makes requisitions for ethereums
+    try:
+        bitcointradeETHResponse = requests.get(bitcointradeurlETH, timeout=MAX_WAIT_TIME).json()
+    except ConnectionError as e:
+        print("A resposta de Bitstamp Eth/Btc não funcionou. " + str(e) + "\n")
+        save_order_books()
 
-    bitcointradeETHResponse = requests.get(bitcointradeurlETH).json()
-    bitstampurlETHResponse = requests.get(bitstampurlETH).json()
+    try:
+        bitstampurlETHResponse = requests.get(bitstampurlETH, timeout=MAX_WAIT_TIME).json()
+    except ConnectionError as e:
+        print("A resposta de Bitstamp Eth/Btc não funcionou. " + str(e) + "\n")
+        save_order_books()
 
     # Sets a current time for all the information collected by the responses
     current_date = timezone.localtime()
