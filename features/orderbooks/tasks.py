@@ -8,6 +8,10 @@ from orderbooks.models import BitcointradeBitcoinBid, BitcointradeBitcoinAsk, Bi
 
 MAX_WAIT_TIME = 5
 
+FINISHED_WITH_SUCCESS = True
+FINISHED_WITH_ERROR = False
+
+
 def save_order_books():
 
     # Set headers and urls
@@ -20,29 +24,39 @@ def save_order_books():
     bitstampurlETH = "https://www.bitstamp.net/api/v2/order_book/ethusd/"
 
     # Makes requisitions for bitcoins
+    try:
+        bitcointradeResponse = requests.get(bitcointradeurl).json()
+    except ConnectionError as e:
+        print("A resposta de Bitcointrade Eth/Btc não funcionou. " + str(e) + "\n")
+        return FINISHED_WITH_ERROR
 
-    bitcointradeResponse = requests.get(bitcointradeurl).json()
-    bitstampResponse = requests.get(bitstrampurl).json()
+    try:
+        bitstampResponse = requests.get(bitstrampurl).json()
+    except ConnectionError as e:
+        print("A resposta de Bitcointrade Eth/Btc não funcionou. " + str(e) + "\n")
+        return FINISHED_WITH_ERROR
 
     # Makes requisitions for eth/btc
     try:
         bitstampEthBtcResponse = requests.get(bitstampethbtcurl, timeout=MAX_WAIT_TIME).json()
     except ConnectionError as e:
         print("A resposta de Bitstamp Eth/Btc não funcionou. " + str(e) + "\n")
-        save_order_books()
+        return FINISHED_WITH_ERROR
 
     # Makes requisitions for ethereums
+    bitcointradeETHResponse = requests.get(bitcointradeurlETH, timeout=MAX_WAIT_TIME)
     try:
-        bitcointradeETHResponse = requests.get(bitcointradeurlETH, timeout=MAX_WAIT_TIME).json()
+        bitcointradeETHResponse = bitcointradeETHResponse.json()
     except ConnectionError as e:
-        print("A resposta de Bitstamp Eth/Btc não funcionou. " + str(e) + "\n")
-        save_order_books()
+        print("A resposta de Bitcointrade Eth não funcionou. " + str(e) + "\n")
+        return FINISHED_WITH_ERROR
 
+    bitstampurlETHResponse = requests.get(bitstampurlETH, timeout=MAX_WAIT_TIME)
     try:
-        bitstampurlETHResponse = requests.get(bitstampurlETH, timeout=MAX_WAIT_TIME).json()
+        bitstampurlETHResponse = bitstampurlETHResponse.json()
     except ConnectionError as e:
-        print("A resposta de Bitstamp Eth/Btc não funcionou. " + str(e) + "\n")
-        save_order_books()
+        print("A resposta de Bitstamp Eth não funcionou. " + str(e) + "\n")
+        return FINISHED_WITH_ERROR
 
     # Sets a current time for all the information collected by the responses
     current_date = timezone.localtime()
@@ -144,3 +158,5 @@ def save_order_books():
         spread=spread_result_bid,
         saved_at=current_date
     )
+
+    return FINISHED_WITH_SUCCESS

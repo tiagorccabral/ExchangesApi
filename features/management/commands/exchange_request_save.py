@@ -14,16 +14,17 @@ SLEEP_EXCEPTION_TIME = 10
 class Command(BaseCommand):
 
     def _make_save_request(self):
-        try:
-            save_order_books()
-        except TimeoutError as e:
+        result = save_order_books()
+        if not result:
+            print("Erro! Esperando " + str(SLEEP_EXCEPTION_TIME) + " segundo(s). Mensagem: ")
             time.sleep(SLEEP_EXCEPTION_TIME)
-            print("Erro! Esperando " + str(SLEEP_EXCEPTION_TIME) + " segundo(s). Mensagem: " + str(e))
-            save_order_books()
-        print("Salvo! Esperando " + str(SLEEP_TIME) + " segundo(s).")
-        time.sleep(SLEEP_TIME)
-        self.handle()
+            return;
+        else:
+            print("Salvo! Esperando " + str(SLEEP_TIME) + " segundo(s).")
+            time.sleep(SLEEP_TIME)
+            return;
 
     def handle(self, *args, **options):
-        print("Salvando dados...")
-        self._make_save_request()
+        while True:
+            print("Salvando dados...")
+            self._make_save_request()
