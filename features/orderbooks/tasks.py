@@ -1,5 +1,8 @@
 import requests
 from django.utils import timezone
+from requests import RequestException
+
+from features.orderbooks.consts import FINISHED_WITH_ERROR, MAX_WAIT_TIME, FINISHED_WITH_SUCCESS, DELETE_TIME
 from orderbooks.models import BitcointradeBitcoinBid, BitcointradeBitcoinAsk, BitstampBitcoinBid, BitstampBitcoinAsk, \
     BitcointradeEthereumsBid, BitcointradeEthereumsAsk, BitstampEthereumsBid, BitstampEthereumsAsk, SpreadMaxBid, \
     BitstampEthBtcBid, BitstampEthBtcAsk, SpreadMaxAsk
@@ -17,18 +20,39 @@ def save_order_books():
     bitstampurlETH = "https://www.bitstamp.net/api/v2/order_book/ethusd/"
 
     # Makes requisitions for bitcoins
+    try:
+        bitcointradeResponse = requests.get(bitcointradeurl).json()
+    except ConnectionError as e:
+        print("A resposta de Bitcointrade Eth/Btc não funcionou. " + str(e) + "\n")
+        return FINISHED_WITH_ERROR
 
-    bitcointradeResponse = requests.get(bitcointradeurl).json()
-    bitstampResponse = requests.get(bitstrampurl).json()
+    try:
+        bitstampResponse = requests.get(bitstrampurl).json()
+    except ConnectionError as e:
+        print("A resposta de Bitcointrade Eth/Btc não funcionou. " + str(e) + "\n")
+        return FINISHED_WITH_ERROR
 
     # Makes requisitions for eth/btc
-
-    bitstampEthBtcResponse = requests.get(bitstampethbtcurl).json()
+    try:
+        bitstampEthBtcResponse = requests.get(bitstampethbtcurl, timeout=MAX_WAIT_TIME).json()
+    except ConnectionError as e:
+        print("A resposta de Bitstamp Eth/Btc não funcionou. " + str(e) + "\n")
+        return FINISHED_WITH_ERROR
 
     # Makes requisitions for ethereums
+    bitcointradeETHResponse = requests.get(bitcointradeurlETH, timeout=MAX_WAIT_TIME)
+    try:
+        bitcointradeETHResponse = bitcointradeETHResponse.json()
+    except ConnectionError as e:
+        print("A resposta de Bitcointrade Eth não funcionou. " + str(e) + "\n")
+        return FINISHED_WITH_ERROR
 
-    bitcointradeETHResponse = requests.get(bitcointradeurlETH).json()
-    bitstampurlETHResponse = requests.get(bitstampurlETH).json()
+    bitstampurlETHResponse = requests.get(bitstampurlETH, timeout=MAX_WAIT_TIME)
+    try:
+        bitstampurlETHResponse = bitstampurlETHResponse.json()
+    except ConnectionError as e:
+        print("A resposta de Bitstamp Eth não funcionou. " + str(e) + "\n")
+        return FINISHED_WITH_ERROR
 
     # Sets a current time for all the information collected by the responses
     current_date = timezone.localtime()
@@ -130,3 +154,35 @@ def save_order_books():
         spread=spread_result_bid,
         saved_at=current_date
     )
+
+    return FINISHED_WITH_SUCCESS
+
+
+def delete_order_books():
+
+    # Deletes all records older then defined DELETE_TIME (in hours)
+    date_interval = timezone.now() - timezone.timedelta(hours=DELETE_TIME)
+
+    # BitcoinTrade bid e asks de Bitcoin
+    BitcointradeBitcoinBid.objects.filter(saved_at__lte=date_interval).delete()
+    BitcointradeBitcoinAsk.objects.filter(saved_at__lte=date_interval).delete()
+
+    # BitcoinTrade bid e asks de Ethereum
+    BitcointradeEthereumsBid.objects.filter(saved_at__lte=date_interval).delete()
+    BitcointradeEthereumsAsk.objects.filter(saved_at__lte=date_interval).delete()
+
+    # Bitstamp bid e asks de Bitcoin
+    BitstampBitcoinBid.objects.filter(saved_at__lte=date_interval).delete()
+    BitstampBitcoinAsk.objects.filter(saved_at__lte=date_interval).delete()
+
+    # Bitstamp bid e asks de Ethereums
+    BitstampEthereumsBid.objects.filter(saved_at__lte=date_interval).delete()
+    BitstampEthereumsAsk.objects.filter(saved_at__lte=date_interval).delete()
+
+    # Bitstamp bid e asks Eth/Btc
+    BitstampEthBtcBid.objects.filter(saved_at__lte=date_interval).delete()
+    BitstampEthBtcAsk.objects.filter(saved_at__lte=date_interval).delete()
+
+    # Spread max bid e asks
+    SpreadMaxAsk.objects.filter(saved_at__lte=date_interval).delete()
+    SpreadMaxBid.objects.filter(saved_at__lte=date_interval).delete()
