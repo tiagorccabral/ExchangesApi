@@ -19,12 +19,12 @@ def save_order_books():
     bitcointradeurlETH = "https://api.bitcointrade.com.br/v1/public/ETH/orders"
     bitstampurlETH = "https://www.bitstamp.net/api/v2/order_book/ethusd/"
 
-    # Makes requisitions for bitcoins
-    try:
-        bitcointradeResponse = requests.get(bitcointradeurl).json()
-    except ConnectionError as e:
-        print("A resposta de Bitcointrade Eth/Btc não funcionou. " + str(e) + "\n")
-        return FINISHED_WITH_ERROR
+    # # Makes requisitions for bitcoins
+    # try:
+    #     bitcointradeResponse = requests.get(bitcointradeurl).json()
+    # except ConnectionError as e:
+    #     print("A resposta de Bitcointrade Eth/Btc não funcionou. " + str(e) + "\n")
+    #     return FINISHED_WITH_ERROR
 
     try:
         bitstampResponse = requests.get(bitstrampurl).json()
@@ -57,21 +57,21 @@ def save_order_books():
     # Sets a current time for all the information collected by the responses
     current_date = timezone.localtime()
 
-    BitcointradeBitcoinBid.objects.create(
-        first_coin_value=bitcointradeResponse['data']['bids'][0]['unit_price'],
-        second_coin_value=bitcointradeResponse['data']['bids'][1]['unit_price'],
-        first_amount=bitcointradeResponse['data']['bids'][0]['amount'],
-        second_amount=bitcointradeResponse['data']['bids'][1]['amount'],
-        saved_at=current_date,
-    )
-
-    BitcointradeBitcoinAsk.objects.create(
-        first_coin_value=bitcointradeResponse['data']['asks'][0]['unit_price'],
-        second_coin_value=bitcointradeResponse['data']['asks'][1]['unit_price'],
-        first_amount=bitcointradeResponse['data']['asks'][0]['amount'],
-        second_amount=bitcointradeResponse['data']['asks'][1]['amount'],
-        saved_at=current_date,
-    )
+    # BitcointradeBitcoinBid.objects.create(
+    #     first_coin_value=bitcointradeResponse['data']['bids'][0]['unit_price'],
+    #     second_coin_value=bitcointradeResponse['data']['bids'][1]['unit_price'],
+    #     first_amount=bitcointradeResponse['data']['bids'][0]['amount'],
+    #     second_amount=bitcointradeResponse['data']['bids'][1]['amount'],
+    #     saved_at=current_date,
+    # )
+    #
+    # BitcointradeBitcoinAsk.objects.create(
+    #     first_coin_value=bitcointradeResponse['data']['asks'][0]['unit_price'],
+    #     second_coin_value=bitcointradeResponse['data']['asks'][1]['unit_price'],
+    #     first_amount=bitcointradeResponse['data']['asks'][0]['amount'],
+    #     second_amount=bitcointradeResponse['data']['asks'][1]['amount'],
+    #     saved_at=current_date,
+    # )
 
     BitstampBitcoinBid.objects.create(
         first_coin_value=bitstampResponse['bids'][0][0],
@@ -89,21 +89,21 @@ def save_order_books():
         saved_at=current_date,
     )
 
-    BitcointradeEthereumsBid.objects.create(
-        first_coin_value=bitcointradeETHResponse['data']['bids'][0]['unit_price'],
-        second_coin_value=bitcointradeETHResponse['data']['bids'][1]['unit_price'],
-        first_amount=bitcointradeETHResponse['data']['bids'][0]['amount'],
-        second_amount=bitcointradeETHResponse['data']['bids'][1]['amount'],
-        saved_at=current_date,
-    )
+    # BitcointradeEthereumsBid.objects.create(
+    #     first_coin_value=bitcointradeETHResponse['data']['bids'][0]['unit_price'],
+    #     second_coin_value=bitcointradeETHResponse['data']['bids'][1]['unit_price'],
+    #     first_amount=bitcointradeETHResponse['data']['bids'][0]['amount'],
+    #     second_amount=bitcointradeETHResponse['data']['bids'][1]['amount'],
+    #     saved_at=current_date,
+    # )
 
-    BitcointradeEthereumsAsk.objects.create(
-        first_coin_value=bitcointradeETHResponse['data']['asks'][0]['unit_price'],
-        second_coin_value=bitcointradeETHResponse['data']['asks'][1]['unit_price'],
-        first_amount=bitcointradeETHResponse['data']['asks'][0]['amount'],
-        second_amount=bitcointradeETHResponse['data']['asks'][1]['amount'],
-        saved_at=current_date,
-    )
+    # BitcointradeEthereumsAsk.objects.create(
+    #     first_coin_value=bitcointradeETHResponse['data']['asks'][0]['unit_price'],
+    #     second_coin_value=bitcointradeETHResponse['data']['asks'][1]['unit_price'],
+    #     first_amount=bitcointradeETHResponse['data']['asks'][0]['amount'],
+    #     second_amount=bitcointradeETHResponse['data']['asks'][1]['amount'],
+    #     saved_at=current_date,
+    # )
 
     BitstampEthereumsBid.objects.create(
         first_coin_value=bitstampurlETHResponse['bids'][0][0],
@@ -133,27 +133,27 @@ def save_order_books():
         saved_at=current_date,
     )
 
-    # Calculates the Max Spread for asks and saves it
-
-    spread_result_ask = ((bitcointradeETHResponse['data']['asks'][0]['unit_price'] /
-                          bitcointradeResponse['data']['asks'][0]['unit_price']) /
-                         float(bitstampEthBtcResponse['asks'][0][0])) - 1.00
-
-    SpreadMaxAsk.objects.create(
-        spread=spread_result_ask,
-        saved_at=current_date
-    )
-
-    # Calculates the Max Spread for bids and saves it
-
-    spread_result_bid = ((bitcointradeETHResponse['data']['bids'][0]['unit_price'] /
-                          bitcointradeResponse['data']['bids'][0]['unit_price']) /
-                         float(bitstampEthBtcResponse['bids'][0][0])) - 1.00
-
-    SpreadMaxBid.objects.create(
-        spread=spread_result_bid,
-        saved_at=current_date
-    )
+    # # Calculates the Max Spread for asks and saves it
+    #
+    # spread_result_ask = ((bitcointradeETHResponse['data']['asks'][0]['unit_price'] /
+    #                       bitcointradeResponse['data']['asks'][0]['unit_price']) /
+    #                      float(bitstampEthBtcResponse['asks'][0][0])) - 1.00
+    #
+    # SpreadMaxAsk.objects.create(
+    #     spread=spread_result_ask,
+    #     saved_at=current_date
+    # )
+    #
+    # # Calculates the Max Spread for bids and saves it
+    #
+    # spread_result_bid = ((bitcointradeETHResponse['data']['bids'][0]['unit_price'] /
+    #                       bitcointradeResponse['data']['bids'][0]['unit_price']) /
+    #                      float(bitstampEthBtcResponse['bids'][0][0])) - 1.00
+    #
+    # SpreadMaxBid.objects.create(
+    #     spread=spread_result_bid,
+    #     saved_at=current_date
+    # )
 
     return FINISHED_WITH_SUCCESS
 
