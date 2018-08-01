@@ -39,13 +39,13 @@ def save_order_books():
         print("A resposta de Bitstamp Eth/Btc não funcionou. " + str(e) + "\n")
         return FINISHED_WITH_ERROR
 
-    # Makes requisitions for ethereums
-    bitcointradeETHResponse = requests.get(bitcointradeurlETH, timeout=MAX_WAIT_TIME)
-    try:
-        bitcointradeETHResponse = bitcointradeETHResponse.json()
-    except ConnectionError as e:
-        print("A resposta de Bitcointrade Eth não funcionou. " + str(e) + "\n")
-        return FINISHED_WITH_ERROR
+    # # Makes requisitions for ethereums
+    # bitcointradeETHResponse = requests.get(bitcointradeurlETH, timeout=MAX_WAIT_TIME)
+    # try:
+    #     bitcointradeETHResponse = bitcointradeETHResponse.json()
+    # except ConnectionError as e:
+    #     print("A resposta de Bitcointrade Eth não funcionou. " + str(e) + "\n")
+    #     return FINISHED_WITH_ERROR
 
     bitstampurlETHResponse = requests.get(bitstampurlETH, timeout=MAX_WAIT_TIME)
     try:
