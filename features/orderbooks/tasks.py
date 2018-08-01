@@ -2,14 +2,10 @@ import requests
 from django.utils import timezone
 from requests import RequestException
 
+from features.orderbooks.consts import FINISHED_WITH_ERROR, MAX_WAIT_TIME, FINISHED_WITH_SUCCESS, DELETE_TIME
 from orderbooks.models import BitcointradeBitcoinBid, BitcointradeBitcoinAsk, BitstampBitcoinBid, BitstampBitcoinAsk, \
     BitcointradeEthereumsBid, BitcointradeEthereumsAsk, BitstampEthereumsBid, BitstampEthereumsAsk, SpreadMaxBid, \
     BitstampEthBtcBid, BitstampEthBtcAsk, SpreadMaxAsk
-
-MAX_WAIT_TIME = 5
-
-FINISHED_WITH_SUCCESS = True
-FINISHED_WITH_ERROR = False
 
 
 def save_order_books():
@@ -160,3 +156,33 @@ def save_order_books():
     )
 
     return FINISHED_WITH_SUCCESS
+
+
+def delete_order_books():
+
+    # Deletes all records older then defined DELETE_TIME (in hours)
+    date_interval = timezone.now() - timezone.timedelta(hours=DELETE_TIME)
+
+    # BitcoinTrade bid e asks de Bitcoin
+    BitcointradeBitcoinBid.objects.filter(saved_at__lte=date_interval).delete()
+    BitcointradeBitcoinAsk.objects.filter(saved_at__lte=date_interval).delete()
+
+    # BitcoinTrade bid e asks de Ethereum
+    BitcointradeEthereumsBid.objects.filter(saved_at__lte=date_interval).delete()
+    BitcointradeEthereumsAsk.objects.filter(saved_at__lte=date_interval).delete()
+
+    # Bitstamp bid e asks de Bitcoin
+    BitstampBitcoinBid.objects.filter(saved_at__lte=date_interval).delete()
+    BitstampBitcoinAsk.objects.filter(saved_at__lte=date_interval).delete()
+
+    # Bitstamp bid e asks de Ethereums
+    BitstampEthereumsBid.objects.filter(saved_at__lte=date_interval).delete()
+    BitstampEthereumsAsk.objects.filter(saved_at__lte=date_interval).delete()
+
+    # Bitstamp bid e asks Eth/Btc
+    BitstampEthBtcBid.objects.filter(saved_at__lte=date_interval).delete()
+    BitstampEthBtcAsk.objects.filter(saved_at__lte=date_interval).delete()
+
+    # Spread max bid e asks
+    SpreadMaxAsk.objects.filter(saved_at__lte=date_interval).delete()
+    SpreadMaxBid.objects.filter(saved_at__lte=date_interval).delete()

@@ -7,7 +7,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from features.orderbooks.tasks import save_order_books
+from features.orderbooks.consts import RECOVER_TIME
+from features.orderbooks.tasks import save_order_books, delete_order_books
 from my_secrets import secrets
 from orderbooks.models import (
     BitcointradeBitcoinBid, BitcointradeBitcoinAsk,
@@ -152,8 +153,8 @@ class RequestOrderBookGraphView(View):
 
     def get(self, request):
 
-        # Sets interval to be greater or equal to the last 24 hours
-        date_interval = timezone.now() - datetime.timedelta(days=1)
+        # Sets interval to be greater or equal to the last RECOVER_TIME (in hours)
+        date_interval = timezone.now() - datetime.timedelta(hours=RECOVER_TIME)
 
         # BitcoinTrade bid e asks de Bitcoin
         bitcointrade_bid_btc = BitcointradeBitcoinBid.objects.filter(saved_at__gte=date_interval).values()
@@ -202,3 +203,10 @@ def SaveDataView(request):
     save_order_books()
 
     return Response({"message": "Dados salvos!"})
+
+@api_view()
+def DeleteDataView(request):
+
+    delete_order_books()
+
+    return Response({"message": "Dados deletados!"})
