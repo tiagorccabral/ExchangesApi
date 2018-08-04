@@ -9,11 +9,11 @@
             <div class="col-md-12">
                 <hr>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-9 text-center">
                 <h2 class="text-center">Spread Máximo - Ask </h2>
                 <canvas id="Spread-Max-Ask"></canvas>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-9">
                 <h2 class="text-center">Spread Máximo - Bid </h2>
                 <canvas id="Spread-Max-Bid"></canvas>
             </div>
@@ -582,21 +582,29 @@
                 labels:bitstamp_eth_btc_times,
                 datasets: [
                     {
+                        yAxisID: 'A',
+                        fill: false,
                         label: 'Primeiro ask Bitcointrade (BTC)',
                         borderColor: "red",
                         data: first_ask_values,
                     },
                     {
+                        yAxisID: 'B',
+                        fill: false,
                         label: 'Primeiro ask Bitcointrade (ETH)',
                         borderColor: "blue",
                         data: first_ask_values_eth,
                     },
                     {
+                        yAxisID: 'C',
+                        fill: false,
                         label: 'Primeiro ask Bitstamp (ETH/BTC)',
                         borderColor: "green",
                         data: bitstamp_first_ask_eth_btc_values
                     },
                     {
+                        yAxisID: 'D',
+                        fill: false,
                         label: 'Spread Maximo Ask',
                         borderColor: "black",
                         data: spread_max_ask_values
@@ -622,11 +630,45 @@
                         }
                     }],
                     yAxes: [{
+                        id: 'A',
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
                         scaleLabel: {
                             display: true,
-                            labelString: 'Valores'
+                            labelString: 'Primeiro ask Bitcointrade (BTC)'
                         }
-                    }]
+                    },
+                        {
+                            id: 'B',
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Primeiro ask Bitcointrade (ETH)'
+                            }
+                        },
+                        {
+                            id: 'C',
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Primeiro ask Bitstamp (ETH/BTC)'
+                            }
+                        },
+                        {
+                            id: 'D',
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Spread Maximo Ask'
+                            }
+                        }]
                 }
             }
 
@@ -639,21 +681,29 @@
                 labels:bitstamp_eth_btc_times,
                 datasets: [
                     {
+                        yAxisID: 'A',
+                        fill: false,
                         label: 'Primeiro bid Bitcointrade (BTC)',
                         borderColor: "red",
                         data: first_bid_values,
                     },
                     {
+                        yAxisID: 'B',
+                        fill: false,
                         label: 'Primeiro bid Bitcointrade (ETH)',
                         borderColor: "blue",
                         data: first_bid_values_eth,
                     },
                     {
+                        yAxisID: 'C',
+                        fill: false,
                         label: 'Primeiro bid Bitstamp (ETH/BTC)',
                         borderColor: "green",
                         data: bitstamp_first_bid_eth_btc_values
                     },
                     {
+                        yAxisID: 'D',
+                        fill: false,
                         label: 'Spread Maximo Bid',
                         borderColor: "black",
                         data: spread_max_bid_values
@@ -679,11 +729,45 @@
                         }
                     }],
                     yAxes: [{
+                        id: 'A',
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
                         scaleLabel: {
                             display: true,
-                            labelString: 'Valores'
+                            labelString: 'Primeiro bid Bitcointrade (BTC)'
                         }
-                    }]
+                    },
+                        {
+                            id: 'B',
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Primeiro bid Bitcointrade (ETH)'
+                            }
+                        },
+                        {
+                            id: 'C',
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Primeiro bid Bitstamp (ETH/BTC)'
+                            }
+                        },
+                        {
+                            id: 'D',
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Spread Maximo Bid'
+                            }
+                        }]
                 }
             }
 
